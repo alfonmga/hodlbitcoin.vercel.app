@@ -81,116 +81,124 @@ const Home: NextPage<{ dbBinStr: string }> = ({ dbBinStr }) => {
   };
 
   return (
-    <div>
+    <>
       <Head>
-        <title>Bitcoin holdings value visualizer</title>
         <meta
-          name="description"
-          content="Visualize your Bitcoin holdings value over time."
+          name="viewport"
+          content="width=device-width, initial-scale=1.0, maximum-scale=1.0,user-scalable=0"
         />
-        <link rel="icon" href="/favicon.ico" />
       </Head>
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          flexDirection: "column",
-        }}
-      >
-        <h1 style={{ color: "white" }}>
-          Visualize your Bitcoin holdings value over time
-        </h1>
-        <input
-          style={{ marginTop: "-22px" }}
-          type="text"
-          value={holdingsInputV}
-          onChange={(evt) =>
-            onHoldingsValueInputChange(evt.currentTarget.value)
-          }
-          placeholder="0.00000000 BTC"
-        />
-      </div>
-
-      <div
-        style={{
-          display: "flex",
-          alignContent: "center",
-          justifyContent: "center",
-        }}
-      >
-        <div style={{ width: "95%" }}>
-          <Chart
-            // key={generatedHoldingsV}
-            data={chartData}
-            options={{
-              interaction: {
-                mode: "nearest",
-                axis: "x",
-                intersect: false,
-              },
-              responsive: true,
-              plugins: {
-                legend: {
-                  display: false,
-                },
-                tooltip: {
-                  backgroundColor: "#222531",
-                  callbacks: {
-                    title: function (j) {
-                      return formatDate(j[0].parsed.x, "MM/dd/yyyy");
-                    },
-                    label: function (context) {
-                      return [
-                        `${context.dataset.label}: ${new Intl.NumberFormat(
-                          "en-US",
-                          {
-                            style: "currency",
-                            currency: "USD",
-                          }
-                        ).format(context.parsed.y)}`,
-                        `Holdings value ${new Intl.NumberFormat("en-US", {
-                          style: "currency",
-                          currency: "USD",
-                        }).format((context.raw as any).holdingsV as number)}`,
-                      ];
-                    },
-                  },
-                },
-              },
-              scales: {
-                x: {
-                  grid: {
-                    color: "#222531",
-                  },
-                  display: true,
-                  type: "time",
-                  time: {
-                    unit: "year",
-                  },
-                  adapters: {
-                    date: {
-                      locale: enUS,
-                    },
-                  },
-                },
-                y: {
-                  grid: {
-                    color: "#222531",
-                  },
-                  display: true,
-                  type: "logarithmic",
-                  ticks: {
-                    color: "#858ca2",
-                  },
-                },
-              },
-            }}
-            type="line"
+      <div>
+        <Head>
+          <title>Bitcoin holdings value visualizer</title>
+          <meta
+            name="description"
+            content="Visualize your Bitcoin holdings value over time."
+          />
+          <link rel="icon" href="/favicon.ico" />
+        </Head>
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            flexDirection: "column",
+          }}
+        >
+          <h1 style={{ color: "white" }}>
+            Visualize your Bitcoin holdings value over time
+          </h1>
+          <input
+            style={{ marginTop: "-22px" }}
+            type="text"
+            value={holdingsInputV}
+            onChange={(evt) =>
+              onHoldingsValueInputChange(evt.currentTarget.value)
+            }
+            placeholder="0.00000000 BTC"
           />
         </div>
+
+        <div
+          style={{
+            display: "flex",
+            alignContent: "center",
+            justifyContent: "center",
+          }}
+        >
+          <div style={{ width: "95%" }}>
+            <Chart
+              // key={generatedHoldingsV}
+              data={chartData}
+              options={{
+                interaction: {
+                  mode: "nearest",
+                  axis: "x",
+                  intersect: false,
+                },
+                responsive: true,
+                plugins: {
+                  legend: {
+                    display: false,
+                  },
+                  tooltip: {
+                    backgroundColor: "#222531",
+                    callbacks: {
+                      title: function (j) {
+                        return formatDate(j[0].parsed.x, "MM/dd/yyyy");
+                      },
+                      label: function (context) {
+                        return [
+                          `${context.dataset.label}: ${new Intl.NumberFormat(
+                            "en-US",
+                            {
+                              style: "currency",
+                              currency: "USD",
+                            }
+                          ).format(context.parsed.y)}`,
+                          `Holdings value ${new Intl.NumberFormat("en-US", {
+                            style: "currency",
+                            currency: "USD",
+                          }).format((context.raw as any).holdingsV as number)}`,
+                        ];
+                      },
+                    },
+                  },
+                },
+                scales: {
+                  x: {
+                    grid: {
+                      color: "#222531",
+                    },
+                    display: true,
+                    type: "time",
+                    time: {
+                      unit: "year",
+                    },
+                    adapters: {
+                      date: {
+                        locale: enUS,
+                      },
+                    },
+                  },
+                  y: {
+                    grid: {
+                      color: "#222531",
+                    },
+                    display: true,
+                    type: "logarithmic",
+                    ticks: {
+                      color: "#858ca2",
+                    },
+                  },
+                },
+              }}
+              type="line"
+            />
+          </div>
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 
