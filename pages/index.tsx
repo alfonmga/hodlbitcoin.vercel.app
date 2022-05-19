@@ -9,7 +9,6 @@ import {
   TimeScale,
   Title,
   Tooltip,
-  Interaction,
 } from "chart.js";
 import "chartjs-adapter-date-fns";
 import fromUnixTime from "date-fns/fromUnixTime";
@@ -20,7 +19,6 @@ import Head from "next/head";
 import { useMemo, useState } from "react";
 import { Chart } from "react-chartjs-2";
 import { useDB, useDBQuery } from "../lib/useDb";
-
 ChartJS.register(
   LogarithmicScale,
   CategoryScale,
@@ -47,9 +45,7 @@ const Home: NextPage<{ dbBinStr: string }> = ({ dbBinStr }) => {
     String(DEFAULT_HOLDINGS_VALUE)
   );
   const [holdingsV, setHoldingsV] = useState<number>(DEFAULT_HOLDINGS_VALUE);
-  const [generatedHoldingsV, setGeneratedHoldingsV] = useState(
-    DEFAULT_HOLDINGS_VALUE
-  );
+
   const chartData = useMemo(() => {
     let labels: any[] = [];
     let data: any[] = [];
@@ -74,7 +70,7 @@ const Home: NextPage<{ dbBinStr: string }> = ({ dbBinStr }) => {
         },
       ],
     };
-  }, [results, holdingsV, generatedHoldingsV]);
+  }, [results, holdingsV]);
 
   const onHoldingsValueInputChange = (value: string) => {
     setHoldingsInputV(value);
@@ -82,9 +78,6 @@ const Home: NextPage<{ dbBinStr: string }> = ({ dbBinStr }) => {
     if (Number.isNaN(n) === false) {
       setHoldingsV(Number(n.toFixed(8)));
     }
-  };
-  const calculateCurrentHoldingsValue = () => {
-    setGeneratedHoldingsV(holdingsV);
   };
 
   return (
