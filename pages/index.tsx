@@ -9,6 +9,7 @@ import {
   TimeScale,
   Title,
   Tooltip,
+  LineController,
 } from "chart.js";
 import "chartjs-adapter-date-fns";
 import fromUnixTime from "date-fns/fromUnixTime";
@@ -21,6 +22,7 @@ import { Chart } from "react-chartjs-2";
 import { useDB, useDBQuery } from "../lib/useDb";
 ChartJS.register(
   LogarithmicScale,
+  LineController,
   CategoryScale,
   PointElement,
   LineElement,
