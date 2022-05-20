@@ -36,7 +36,7 @@ jobs:
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
           git add -A
-          git commit -m "Insert $(date '+%m/%d/%Y') Bitcoin price into database" -a
+          git commit -m "Insert $(date --date='-1 days' '+%m/%d/%Y') Bitcoin price into database" -a
         shell: bash
 
       - name: push changes
