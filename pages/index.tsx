@@ -88,14 +88,31 @@ const Home: NextPage<{ dbBinStr: string }> = ({ dbBinStr }) => {
           bitcoinPricesData={bitcoinPricesData}
           holdingsAmountV={holdingsAmountV}
         />
-        <div style={{ textAlign: "center" }}>
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            textAlign: "center",
+            marginTop: "7px",
+          }}
+        >
           <a
             href="https://github.com/alfonmga/hodlbitcoin.vercel.app"
             target="_blank"
             rel="noreferrer"
           >
-            <h4>View source code</h4>
+            View source code
           </a>
+          <p
+            style={{
+              color: "#c2c2c2",
+              fontSize: "11px",
+              marginTop: "7px",
+            }}
+          >
+            Did you like it? send me some digital energy to{" "}
+            <b>bc1qmz0fmcj72fk02lke0002yvh852ctsy38w5mn82</b>
+          </p>
         </div>
       </div>
     </>
