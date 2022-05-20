@@ -115,6 +115,12 @@ const HoldingsInputField = ({
   const onGenerate = () => {
     let n = Number(holdingsInputV);
     if (Number.isNaN(n) === false) {
+      if (n > 21000000) {
+        alert(
+          "Mate, Bitcoin is scarce! There cannot be more than 21mm bitcoins."
+        );
+        return;
+      }
       setGeneratedV(generatedV);
       onChange(Number(n.toFixed(8)));
     }
