@@ -138,6 +138,11 @@ const HoldingsInputField = ({
         );
         return;
       }
+      let nStr = n.toString();
+      if (nStr.includes(".") && nStr.split(".")[1].length > 8) {
+        alert("Error: One Bitcoin is divisible only to eight decimal places.");
+        return;
+      }
       setGeneratedV(generatedV);
       onChange(Number(n.toFixed(8)));
     }
