@@ -151,6 +151,7 @@ const HoldingsInputField = ({
   return (
     <>
       <input
+        autoFocus
         style={{ marginTop: "-22px" }}
         type="text"
         value={holdingsInputV}
