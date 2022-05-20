@@ -8,5 +8,5 @@
 - React.js
 - Chart.js
 - date-fns
-- Bitfinex API
-- Github Actions
+- Binance API
+- GitHub Actions (Every day at 00:00 UTC a GitHub action is run to fetch the Bitcoin price and insert it into the SQLite database)
