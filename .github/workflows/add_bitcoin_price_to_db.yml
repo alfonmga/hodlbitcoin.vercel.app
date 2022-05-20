@@ -25,7 +25,7 @@ jobs:
         run: "sudo apt-get install -y sqlite3"
 
       - name: Insert fetched Bitcoin price into the database
-        run: "sqlite3 data.sqlite3 'INSERT INTO prices (date,price) values ($(date --date=yesterday +%s),${{ steps.bitcoin_price.outputs.value }});'"
+        run: 'sqlite3 data.sqlite3 "INSERT INTO prices (date,price) values ($(date --date=yesterday +%s),${{ steps.bitcoin_price.outputs.value }});"'
         shell: bash
 
       - name: Delete temporal _btcprice.json
