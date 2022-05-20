@@ -110,7 +110,7 @@ const Home: NextPage<{ dbBinStr: string }> = ({ dbBinStr }) => {
               marginTop: "7px",
             }}
           >
-            Did you like it? send me some digital energy to{" "}
+            Did you like it? send me some digital energy{" "}
             <b>bc1qmz0fmcj72fk02lke0002yvh852ctsy38w5mn82</b>
           </p>
         </div>
