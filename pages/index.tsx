@@ -75,7 +75,7 @@ const Home: NextPage<{ dbBinStr: string }> = ({ dbBinStr }) => {
             textAlign: "center",
           }}
         >
-          <h1 style={{ color: "white" }}>
+          <h1 style={{ color: "white", fontSize: "2em" }}>
             Visualize your Bitcoin holdings value over time
           </h1>
           <HoldingsInputField
@@ -134,7 +134,7 @@ const HoldingsInputField = ({
     if (Number.isNaN(n) === false) {
       if (n > 21000000) {
         alert(
-          "Mate, Bitcoin is scarce! There cannot be more than 21mm bitcoins."
+          "Mate, Bitcoin is scarce! There cannot be more than 21MM bitcoins."
         );
         return;
       }
