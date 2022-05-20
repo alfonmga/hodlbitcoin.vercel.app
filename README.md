@@ -9,4 +9,4 @@
 - Chart.js
 - date-fns
 - Binance API
-- GitHub Actions (Every day at 00:00 UTC a GitHub action is run to fetch the Bitcoin price and insert it into the SQLite database)
+- GitHub Actions (Every day at 00:00 UTC a GitHub Action is run to fetch the Bitcoin price and insert it into the SQLite database)
