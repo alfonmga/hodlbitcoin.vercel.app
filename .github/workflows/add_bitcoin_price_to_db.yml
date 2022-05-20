@@ -1,0 +1,45 @@
+name: add_activities_to_db
+
+on:
+  schedule:
+    - cron: "0 0 * * *"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout repo content
+        uses: actions/checkout@v2
+
+      - name: Get latest Bitcoin price from Binance API
+        run: "curl 'https://api.binance.com/api/v3/avgPrice?symbol=BTCUSDT' -o _btcprice.json"
+
+      - name: Extract Bitcoin price from Binace API response
+        uses: sergeysova/jq-action@v2
+        id: bitcoin_price
+        with:
+          cmd: "jq .price _btcprice.json -r"
+
+      - name: Install SQLite CLI
+        run: "sudo apt-get install -y sqlite3"
+
+      - name: Insert fetched Bitcoin price into the database
+        run: "sqlite3 data.sqlite3 'INSERT INTO prices (date,price) values ($(date --date=yesterday +%s),${{ steps.bitcoin_price.outputs.value }});'"
+        shell: bash
+
+      - name: Delete temporal _btcprice.json
+        run: "rm _btcprice.json"
+
+      - name: commit files
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add -A
+          git commit -m "Insert $(date '+%m/%d/%Y') Bitcoin price into database" -a
+        shell: bash
+
+      - name: push changes
+        uses: ad-m/github-push-action@v0.6.0
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: master
