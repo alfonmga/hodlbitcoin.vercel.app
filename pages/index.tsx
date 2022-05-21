@@ -130,8 +130,8 @@ const HoldingsInputField = ({
   );
   const [generatedV, setGeneratedV] = useState(currentHoldingsAmountV);
   const onGenerate = () => {
-    let n = Number(holdingsInputV);
-    if (Number.isNaN(n) === false) {
+    if (Number.isNaN(holdingsInputV) === false) {
+      let n = Number(holdingsInputV);
       if (n > 21000000) {
         alert(
           "Mate, Bitcoin is scarce! There cannot be more than 21MM bitcoins."
@@ -143,11 +143,12 @@ const HoldingsInputField = ({
         alert("Error: One Bitcoin is divisible only to eight decimal places.");
         return;
       }
-      setGeneratedV(generatedV);
-      onChange(Number(n.toFixed(8)));
+      setGeneratedV(n);
+      onChange(n);
     }
   };
-
+  const isGenerationDisabled =
+    holdingsInputV.length === 0 || holdingsInputV === String(generatedV);
   return (
     <>
       <input
@@ -157,13 +158,17 @@ const HoldingsInputField = ({
         value={holdingsInputV}
         onChange={(evt) => setHoldingsInputV(evt.currentTarget.value)}
         placeholder="0.00000000 BTC"
+        onKeyDown={(e) => {
+          if (e.code === "Enter") {
+            e.preventDefault();
+            e.stopPropagation();
+            if (!isGenerationDisabled) {
+              onGenerate();
+            }
+          }
+        }}
       />
-      <button
-        onClick={onGenerate}
-        disabled={
-          holdingsInputV.length === 0 || holdingsInputV === String(generatedV)
-        }
-      >
+      <button onClick={onGenerate} disabled={isGenerationDisabled}>
         Generate chart
       </button>
     </>
