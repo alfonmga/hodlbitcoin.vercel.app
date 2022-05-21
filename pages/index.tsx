@@ -214,6 +214,7 @@ const HoldingsChart = ({
         <Chart
           data={chartData}
           options={{
+            animation: false,
             interaction: {
               mode: "nearest",
               axis: "x",
