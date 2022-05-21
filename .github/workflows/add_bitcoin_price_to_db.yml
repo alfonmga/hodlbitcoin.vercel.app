@@ -11,32 +11,34 @@ jobs:
       - name: checkout repo content
         uses: actions/checkout@v2
 
-      - name: Get latest Bitcoin price from Binance API
-        run: "curl 'https://api.binance.com/api/v3/avgPrice?symbol=BTCUSDT' -o _btcprice.json"
+      - name: Get yesterday Bitcoin data from CoinGecko API
+        run: |
+          curl -X 'GET' 'https://api.coingecko.com/api/v3/coins/bitcoin/history?date=$(date --date="-1 days" "+%d-%m-%Y")&localization=false' -H 'accept: application/json' -o _btcdata.json
+        shell: bash
 
-      - name: Extract Bitcoin price from Binace API response
+      - name: Extract Bitcoin price from CoinGecko API response
         uses: sergeysova/jq-action@v2
-        id: bitcoin_price
+        id: yesterday_bitcoin_price
         with:
-          cmd: "jq .price _btcprice.json -r"
+          cmd: "jq .market_data.current_price.usd _btcdata.json -r"
 
       - name: Install SQLite CLI
         run: "sudo apt-get install -y sqlite3"
 
       - name: Insert fetched Bitcoin price into the database
         run: |
-          sqlite3 data.sqlite3 "INSERT INTO prices (date,price) values ($(date --date='yesterday 00:00' +%s),${{ steps.bitcoin_price.outputs.value }});"
+          sqlite3 data.sqlite3 "INSERT INTO prices (date,price) values ($(date --date='yesterday 00:00' +%s),${{ steps.yesterday_bitcoin_price.outputs.value }});"
         shell: bash
 
-      - name: Delete temporal _btcprice.json
-        run: "rm _btcprice.json"
+      - name: Delete temporal _btcdata.json
+        run: "rm _btcdata.json"
 
       - name: commit files
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
           git add -A
-          git commit -m "Insert $(date --date='-1 days' '+%m/%d/%Y') Bitcoin price into database" -a
+          git commit -m "Insert $(date --date='-1 days' '+%Y-%m-%d') Bitcoin price into database" -a
         shell: bash
 
       - name: push changes
