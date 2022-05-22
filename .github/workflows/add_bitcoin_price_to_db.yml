@@ -1,8 +1,9 @@
 name: add_bitcoin_price_to_db.yml
 
 on:
-  schedule:
-    - cron: "0 0 * * *"
+  workflow_dispatch
+  # schedule:
+  #   - cron: "0 0 * * *"
 
 jobs:
   build:
@@ -13,7 +14,7 @@ jobs:
 
       - name: Get yesterday's Bitcoin data from CoinGecko API
         run: |
-          curl -X 'GET' 'https://api.coingecko.com/api/v3/coins/bitcoin/history?date=$(date --date="-1 days" "+%d-%m-%Y")&localization=false' -H 'accept: application/json' -o _btcdata.json
+          curl -X "GET" "https://api.coingecko.com/api/v3/coins/bitcoin/history?date=$(date --date='-1 days' '+%d-%m-%Y')&localization=false" -H "accept: application/json" -o _btcdata.json
         shell: bash
 
       - name: Extract Bitcoin price from CoinGecko API response
