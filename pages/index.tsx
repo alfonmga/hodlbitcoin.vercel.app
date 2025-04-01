@@ -140,19 +140,14 @@ const Home: NextPage<{ dbBinStr: string }> = ({ dbBinStr }) => {
             href="https://github.com/alfonmga/hodlbitcoin.vercel.app"
             target="_blank"
             rel="noreferrer"
-          >
-            View source code
-          </a>
-          <p
             style={{
               color: "#c2c2c2",
               fontSize: "11px",
               marginTop: "7px",
             }}
           >
-            Did you like it? send me some digital energy{" "}
-            <b>bc1qmz0fmcj72fk02lke0002yvh852ctsy38w5mn82</b>
-          </p>
+            View source code
+          </a>
         </div>
       </div>
     </>
