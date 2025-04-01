@@ -18,7 +18,7 @@ import formatDistanceToNow from "date-fns/formatDistanceToNow";
 import { enUS } from "date-fns/locale";
 import type { GetStaticProps, NextPage } from "next";
 import Head from "next/head";
-import { Dispatch, SetStateAction, useMemo, useState } from "react";
+import { Dispatch, SetStateAction, useMemo, useState, useEffect } from "react";
 import { Chart } from "react-chartjs-2";
 import { QueryExecResult } from "sql.js";
 import { useDB, useDBQuery } from "../lib/useDb";
@@ -38,6 +38,8 @@ ChartJS.register(
 
 const DEFAULT_HOLDINGS_AMOUNT_VALUE = 1;
 
+type Currency = 'USD' | 'EUR';
+
 const Home: NextPage<{ dbBinStr: string }> = ({ dbBinStr }) => {
   const dbBin = useMemo(
     () => (dbBinStr ? (JSON.parse(dbBinStr).data as Uint8Array) : null),
@@ -49,6 +51,36 @@ const Home: NextPage<{ dbBinStr: string }> = ({ dbBinStr }) => {
   const [holdingsAmountV, setHoldingsAmountV] = useState<number>(
     DEFAULT_HOLDINGS_AMOUNT_VALUE
   );
+  const [selectedCurrency, setSelectedCurrency] = useState<Currency>('USD');
+  const [eurUsdRate, setEurUsdRate] = useState<number | null>(null);
+  const [isZoomEnabled, setIsZoomEnabled] = useState(false);
+
+  useEffect(() => {
+    const loadZoomPlugin = async () => {
+      const zoomPlugin = (await import('chartjs-plugin-zoom')).default;
+      ChartJS.register(zoomPlugin);
+      setIsZoomEnabled(true);
+    };
+    loadZoomPlugin();
+  }, []);
+
+  useEffect(() => {
+    const fetchEurUsdRate = async () => {
+      try {
+        const response = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd,eur');
+        const data = await response.json();
+        const usdPrice = data.bitcoin.usd;
+        const eurPrice = data.bitcoin.eur;
+        setEurUsdRate(eurPrice / usdPrice);
+      } catch (error) {
+        console.error('Error fetching EUR/USD rate:', error);
+      }
+    };
+
+    fetchEurUsdRate();
+    const interval = setInterval(fetchEurUsdRate, 60000); // Update every minute
+    return () => clearInterval(interval);
+  }, []);
 
   return (
     <>
@@ -83,11 +115,18 @@ const Home: NextPage<{ dbBinStr: string }> = ({ dbBinStr }) => {
             currentHoldingsAmountV={holdingsAmountV}
             onChange={(v) => setHoldingsAmountV(v)}
           />
+          <CurrencySelector
+            selectedCurrency={selectedCurrency}
+            onChange={setSelectedCurrency}
+          />
         </div>
         <HoldingsChart
           key={holdingsAmountV}
           bitcoinPricesData={bitcoinPricesData}
           holdingsAmountV={holdingsAmountV}
+          selectedCurrency={selectedCurrency}
+          eurUsdRate={eurUsdRate}
+          isZoomEnabled={isZoomEnabled}
         />
         <div
           style={{
@@ -175,12 +214,44 @@ const HoldingsInputField = ({
     </>
   );
 };
+const CurrencySelector = ({
+  selectedCurrency,
+  onChange,
+}: {
+  selectedCurrency: Currency;
+  onChange: (currency: Currency) => void;
+}) => {
+  return (
+    <div style={{ marginTop: "10px" }}>
+      <select
+        value={selectedCurrency}
+        onChange={(e) => onChange(e.target.value as Currency)}
+        style={{
+          padding: "5px",
+          borderRadius: "4px",
+          border: "1px solid #ccc",
+          backgroundColor: "#1a1a1a",
+          color: "white",
+        }}
+      >
+        <option value="USD">USD</option>
+        <option value="EUR">EUR</option>
+      </select>
+    </div>
+  );
+};
 const HoldingsChart = ({
   bitcoinPricesData,
   holdingsAmountV,
+  selectedCurrency,
+  eurUsdRate,
+  isZoomEnabled,
 }: {
   bitcoinPricesData: QueryExecResult[] | null;
   holdingsAmountV: number;
+  selectedCurrency: Currency;
+  eurUsdRate: number | null;
+  isZoomEnabled: boolean;
 }) => {
   const chartData = useMemo(() => {
     let labels: any[] = [];
@@ -190,7 +261,12 @@ const HoldingsChart = ({
         const d = fromUnixTime(v[0] as number);
         const p = v[1] as number;
         labels.push(d);
-        data.push({ x: d, y: holdingsAmountV * p, price: p });
+        const value = holdingsAmountV * p;
+        data.push({ 
+          x: d, 
+          y: selectedCurrency === 'EUR' && eurUsdRate ? value * eurUsdRate : value,
+          price: p 
+        });
       });
     }
 
@@ -198,7 +274,7 @@ const HoldingsChart = ({
       labels,
       datasets: [
         {
-          label: "Holdings value",
+          label: `Holdings value`,
           data,
           borderColor: "#f2a900",
           backgroundColor: "#f2a900",
@@ -206,7 +282,7 @@ const HoldingsChart = ({
         },
       ],
     };
-  }, [bitcoinPricesData, holdingsAmountV]);
+  }, [bitcoinPricesData, holdingsAmountV, selectedCurrency, eurUsdRate]);
 
   const athValue = useMemo(() => {
     if (!bitcoinPricesData) return null;
@@ -216,14 +292,15 @@ const HoldingsChart = ({
     
     values.forEach(v => {
       const value = holdingsAmountV * (v[1] as number);
-      if (value > maxValue) {
-        maxValue = value;
+      const finalValue = selectedCurrency === 'EUR' && eurUsdRate ? value * eurUsdRate : value;
+      if (finalValue > maxValue) {
+        maxValue = finalValue;
         maxDate = v[0] as number;
       }
     });
     
     return { value: maxValue, date: maxDate };
-  }, [bitcoinPricesData, holdingsAmountV]);
+  }, [bitcoinPricesData, holdingsAmountV, selectedCurrency, eurUsdRate]);
 
   return (
     <div
@@ -241,9 +318,9 @@ const HoldingsChart = ({
           fontSize: "1.2em",
           fontWeight: "bold"
         }}>
-          All-Time High: {new Intl.NumberFormat("en-US", {
+          All-Time High: {new Intl.NumberFormat(selectedCurrency === 'EUR' ? 'es-ES' : 'en-US', {
             style: "currency",
-            currency: "USD",
+            currency: selectedCurrency,
           }).format(athValue.value)}{" "}
           <span style={{ 
             color: "#858ca2", 
@@ -279,20 +356,50 @@ const HoldingsChart = ({
                   label: function (context) {
                     return [
                       `${context.dataset.label}: ${new Intl.NumberFormat(
-                        "en-US",
+                        selectedCurrency === 'EUR' ? 'es-ES' : 'en-US',
                         {
                           style: "currency",
-                          currency: "USD",
+                          currency: selectedCurrency,
                         }
                       ).format(context.parsed.y)}`,
-                      `Bitcoin price: ${new Intl.NumberFormat("en-US", {
-                        style: "currency",
-                        currency: "USD",
-                      }).format((context.raw as any).price as number)}`,
+                      `Bitcoin price: ${new Intl.NumberFormat(
+                        selectedCurrency === 'EUR' ? 'es-ES' : 'en-US',
+                        {
+                          style: "currency",
+                          currency: selectedCurrency,
+                        }
+                      ).format((context.raw as any).price as number)}`,
                     ];
                   },
                 },
               },
+              ...(isZoomEnabled ? {
+                zoom: {
+                  zoom: {
+                    wheel: {
+                      enabled: true,
+                      modifierKey: 'ctrl',
+                      speed: 0.1
+                    },
+                    pinch: {
+                      enabled: true
+                    },
+                    mode: 'x',
+                    drag: {
+                      enabled: true,
+                      backgroundColor: 'rgba(242, 169, 0, 0.1)',
+                      borderColor: '#f2a900',
+                      borderWidth: 1,
+                      threshold: 10
+                    }
+                  },
+                  pan: {
+                    enabled: true,
+                    mode: 'x',
+                    modifierKey: 'shift'
+                  }
+                }
+              } : {})
             },
             scales: {
               x: {
