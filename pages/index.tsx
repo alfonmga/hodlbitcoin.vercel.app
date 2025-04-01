@@ -207,14 +207,34 @@ const HoldingsChart = ({
     };
   }, [bitcoinPricesData, holdingsAmountV]);
 
+  const athValue = useMemo(() => {
+    if (!bitcoinPricesData) return null;
+    const maxValue = Math.max(...bitcoinPricesData[0].values.map(v => holdingsAmountV * (v[1] as number)));
+    return maxValue;
+  }, [bitcoinPricesData, holdingsAmountV]);
+
   return (
     <div
       style={{
         display: "flex",
         alignContent: "center",
         justifyContent: "center",
+        flexDirection: "column",
       }}
     >
+      {athValue && (
+        <div style={{ 
+          marginBottom: "20px", 
+          color: "#f2a900",
+          fontSize: "1.2em",
+          fontWeight: "bold"
+        }}>
+          All-Time High: {new Intl.NumberFormat("en-US", {
+            style: "currency",
+            currency: "USD",
+          }).format(athValue)}
+        </div>
+      )}
       <div style={{ width: "1280px" }}>
         <Chart
           data={chartData}
