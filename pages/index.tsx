@@ -13,12 +13,12 @@ import {
 } from "chart.js";
 import "chartjs-adapter-date-fns";
 import formatDate from "date-fns/format";
-import fromUnixTime from "date-fns/fromUnixTime";
 import formatDistanceToNow from "date-fns/formatDistanceToNow";
+import fromUnixTime from "date-fns/fromUnixTime";
 import { enUS } from "date-fns/locale";
 import type { GetStaticProps, NextPage } from "next";
 import Head from "next/head";
-import { Dispatch, SetStateAction, useMemo, useState, useEffect } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Chart } from "react-chartjs-2";
 import { QueryExecResult } from "sql.js";
 import { useDB, useDBQuery } from "../lib/useDb";
