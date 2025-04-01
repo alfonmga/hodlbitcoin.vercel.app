@@ -36,7 +36,7 @@ ChartJS.register(
   Title
 );
 
-const DEFAULT_HOLDINGS_AMOUNT_VALUE = 1;
+const DEFAULT_HOLDINGS_AMOUNT_VALUE = 1.00000000;
 
 type Currency = 'USD' | 'EUR';
 
@@ -170,22 +170,27 @@ const HoldingsInputField = ({
   );
   const [generatedV, setGeneratedV] = useState(currentHoldingsAmountV);
   const onGenerate = () => {
-    if (Number.isNaN(holdingsInputV) === false) {
-      let n = Number(holdingsInputV);
-      if (n > 21000000) {
-        alert(
-          "Mate, Bitcoin is scarce! There cannot be more than 21MM bitcoins."
-        );
-        return;
-      }
-      let nStr = n.toString();
-      if (nStr.includes(".") && nStr.split(".")[1].length > 8) {
-        alert("Error: One Bitcoin is divisible only to eight decimal places.");
-        return;
-      }
-      setGeneratedV(n);
-      onChange(n);
+    const parsedValue = Number(holdingsInputV);
+    if (Number.isNaN(parsedValue)) {
+      alert("Invalid input. Falling back to default value of 1 BTC.");
+      setHoldingsInputV(DEFAULT_HOLDINGS_AMOUNT_VALUE.toString());
+      setGeneratedV(DEFAULT_HOLDINGS_AMOUNT_VALUE)
+      onChange(DEFAULT_HOLDINGS_AMOUNT_VALUE)
+      return;
     }
+    if (parsedValue > 21000000) {
+      alert(
+        "Mate, Bitcoin is scarce! There cannot be more than 21MM bitcoins."
+      );
+      return;
+    }
+    let nStr = parsedValue.toString();
+    if (nStr.includes(".") && nStr.split(".")[1].length > 8) {
+      alert("Error: One Bitcoin is divisible only to eight decimal places.");
+      return;
+    }
+    setGeneratedV(parsedValue);
+    onChange(parsedValue);
   };
   const isGenerationDisabled =
     holdingsInputV.length === 0 || holdingsInputV === String(generatedV);
