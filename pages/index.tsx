@@ -14,6 +14,7 @@ import {
 import "chartjs-adapter-date-fns";
 import formatDate from "date-fns/format";
 import fromUnixTime from "date-fns/fromUnixTime";
+import formatDistanceToNow from "date-fns/formatDistanceToNow";
 import { enUS } from "date-fns/locale";
 import type { GetStaticProps, NextPage } from "next";
 import Head from "next/head";
@@ -209,8 +210,19 @@ const HoldingsChart = ({
 
   const athValue = useMemo(() => {
     if (!bitcoinPricesData) return null;
-    const maxValue = Math.max(...bitcoinPricesData[0].values.map(v => holdingsAmountV * (v[1] as number)));
-    return maxValue;
+    const values = bitcoinPricesData[0].values;
+    let maxValue = 0;
+    let maxDate = 0;
+    
+    values.forEach(v => {
+      const value = holdingsAmountV * (v[1] as number);
+      if (value > maxValue) {
+        maxValue = value;
+        maxDate = v[0] as number;
+      }
+    });
+    
+    return { value: maxValue, date: maxDate };
   }, [bitcoinPricesData, holdingsAmountV]);
 
   return (
@@ -232,7 +244,15 @@ const HoldingsChart = ({
           All-Time High: {new Intl.NumberFormat("en-US", {
             style: "currency",
             currency: "USD",
-          }).format(athValue)}
+          }).format(athValue.value)}{" "}
+          <span style={{ 
+            color: "#858ca2", 
+            fontWeight: "normal",
+            fontSize: "0.85em",
+            opacity: 0.8
+          }}>
+            ({formatDate(fromUnixTime(athValue.date), "yyyy-MM-dd")} · {formatDistanceToNow(fromUnixTime(athValue.date), { addSuffix: true })})
+          </span>
         </div>
       )}
       <div style={{ width: "1280px" }}>
