@@ -321,7 +321,9 @@ const HoldingsChart = ({
           marginBottom: "20px", 
           color: "#f2a900",
           fontSize: "1.2em",
-          fontWeight: "bold"
+          fontWeight: "bold",
+          width: "1280px",
+          margin: "0 auto 20px auto"
         }}>
           All-Time High: {new Intl.NumberFormat(selectedCurrency === 'EUR' ? 'es-ES' : 'en-US', {
             style: "currency",
@@ -337,7 +339,7 @@ const HoldingsChart = ({
           </span>
         </div>
       )}
-      <div style={{ width: "1280px" }}>
+      <div style={{ width: "1280px", margin: "0 auto" }}>
         <Chart
           data={chartData}
           options={{
